@@ -1,0 +1,132 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Producto{% endblock %}
+
+{% block header %}Detalle de Producto{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:producto_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:producto_update' producto.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:producto_delete' producto.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            {% if producto.imagen %}
+            <div class="col-md-4 mb-4 text-center">
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="img-fluid rounded" style="max-height: 250px;">
+            </div>
+            <div class="col-md-8">
+            {% else %}
+            <div class="col-md-12">
+            {% endif %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h5>Nombre</h5>
+                        <p>{{ producto.nombre }}</p>
+                    </div>
+            <div class="col-md-6 mb-3">
+                <h5>Descripción</h5>
+                <p>{{ producto.descripcion }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Precio</h5>
+                <p>${{ producto.precio }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Proveedor</h5>
+                <p><a href="{{ producto.proveedor.get_absolute_url }}">{{ producto.proveedor }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Marca</h5>
+                <p><a href="{{ producto.marca.get_absolute_url }}">{{ producto.marca }}</a></p>
+            </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Unidad de Medida</h5>
+                        <p><a href="{{ producto.um.get_absolute_url }}">{{ producto.um }}</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stock relacionado -->
+        <hr>
+        <h4>Stock</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Cantidad</th>
+                        <th>Fecha de Modificación</th>
+                        <th>En Uso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in producto.stock_set.all %}
+                    <tr>
+                        <td>{{ stock.cantidad }}</td>
+                        <td>{{ stock.fecha_modificacion }}</td>
+                        <td>{% if stock.en_uso %}Sí{% else %}No{% endif %}</td>
+                        <td>
+                            <a href="{{ stock.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay registros de stock para este producto.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Detalles de Venta relacionados -->
+        <hr>
+        <h4>Historial de Ventas</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Venta</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in producto.detalleventa_set.all %}
+                    <tr>
+                        <td><a href="{{ detalle.venta.get_absolute_url }}">{{ detalle.venta }}</a></td>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>${{ detalle.precio_unitario }}</td>
+                        <td>${{ detalle.cantidad|floatformat:0|default:0|stringformat:"s"|add:" * "|add:detalle.precio_unitario|stringformat:"s"|add:" = $"|add:detalle.cantidad|floatformat:0|default:0|stringformat:"s"|add:"*"|add:detalle.precio_unitario|stringformat:"s" }}</td>
+                        <td>
+                            <a href="{{ detalle.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay registros de ventas para este producto.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

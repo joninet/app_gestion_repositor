@@ -1,0 +1,36 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Eliminar Stock{% endblock %}
+
+{% block header %}Eliminar Stock{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:stock_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="alert alert-danger">
+            <h4 class="alert-heading">¡Advertencia!</h4>
+            <p>¿Estás seguro de que deseas eliminar este registro de stock?</p>
+            <p><strong>{{ stock.producto }} - {{ stock.cantidad }}</strong></p>
+            <p>Esta acción no se puede deshacer.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Sí, eliminar
+                </button>
+                <a href="{% url 'productos:stock_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

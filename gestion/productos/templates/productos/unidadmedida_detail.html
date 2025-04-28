@@ -1,0 +1,67 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Unidad de Medida{% endblock %}
+
+{% block header %}Detalle de Unidad de Medida{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:unidadmedida_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:unidadmedida_update' unidadmedida.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:unidadmedida_delete' unidadmedida.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Nombre</h5>
+                <p>{{ unidadmedida.nombre }}</p>
+            </div>
+        </div>
+        
+        <!-- Productos relacionados -->
+        <hr>
+        <h4>Productos</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Proveedor</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in unidadmedida.producto_set.all %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.descripcion }}</td>
+                        <td>${{ producto.precio }}</td>
+                        <td>{{ producto.proveedor }}</td>
+                        <td>
+                            <a href="{{ producto.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay productos asociados a esta unidad de medida.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

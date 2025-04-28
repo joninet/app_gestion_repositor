@@ -1,0 +1,88 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Registro de Usuario{% endblock %}
+
+{% block header %}Registro de Usuario{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Nombre de usuario</label>
+                        <input type="text" name="username" id="id_username" class="form-control" required>
+                        {% if form.username.errors %}
+                        <div class="text-danger">
+                            {% for error in form.username.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Correo electrónico</label>
+                        <input type="email" name="email" id="id_email" class="form-control" required>
+                        {% if form.email.errors %}
+                        <div class="text-danger">
+                            {% for error in form.email.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password1" class="form-label">Contraseña</label>
+                        <input type="password" name="password1" id="id_password1" class="form-control" required>
+                        {% if form.password1.errors %}
+                        <div class="text-danger">
+                            {% for error in form.password1.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            La contraseña debe tener al menos 8 caracteres y no puede ser demasiado común.
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password2" class="form-label">Confirmar contraseña</label>
+                        <input type="password" name="password2" id="id_password2" class="form-control" required>
+                        {% if form.password2.errors %}
+                        <div class="text-danger">
+                            {% for error in form.password2.errors %}
+                            <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i> Registrarse
+                        </button>
+                    </div>
+                    
+                    <div class="mt-3 text-center">
+                        <p>¿Ya tienes una cuenta? <a href="{% url 'productos:login' %}">Inicia sesión aquí</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

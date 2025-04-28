@@ -1,0 +1,65 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Estado de Pago{% endblock %}
+
+{% block header %}Detalle de Estado de Pago{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:estadopago_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:estadopago_update' estadopago.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:estadopago_delete' estadopago.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Estado</h5>
+                <p>{{ estadopago.estado }}</p>
+            </div>
+        </div>
+        
+        <!-- Ventas relacionadas -->
+        <hr>
+        <h4>Ventas con este Estado</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in estadopago.venta_set.all %}
+                    <tr>
+                        <td>{{ venta.cliente }}</td>
+                        <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>${{ venta.total }}</td>
+                        <td>
+                            <a href="{{ venta.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay ventas con este estado de pago.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

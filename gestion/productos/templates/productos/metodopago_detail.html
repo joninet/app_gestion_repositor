@@ -1,0 +1,65 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Método de Pago{% endblock %}
+
+{% block header %}Detalle de Método de Pago{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:metodopago_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:metodopago_update' metodopago.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:metodopago_delete' metodopago.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Método</h5>
+                <p>{{ metodopago.metodo }}</p>
+            </div>
+        </div>
+        
+        <!-- Pagos relacionados -->
+        <hr>
+        <h4>Pagos con este Método</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Venta</th>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in metodopago.pago_set.all %}
+                    <tr>
+                        <td><a href="{{ pago.venta.get_absolute_url }}">{{ pago.venta }}</a></td>
+                        <td>{{ pago.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>${{ pago.monto }}</td>
+                        <td>
+                            <a href="{{ pago.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay pagos con este método.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

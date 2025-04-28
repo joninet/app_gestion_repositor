@@ -1,0 +1,57 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Lista de Ventas{% endblock %}
+
+{% block header %}Lista de Ventas{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:venta_create' %}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Nueva Venta
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover table-mobile-optimize">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th class="d-none d-md-table-cell">Total</th>
+                        <th class="d-none d-md-table-cell">Estado de Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.cliente }}</td>
+                        <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+                        <td class="d-none d-md-table-cell">${{ venta.total }}</td>
+                        <td class="d-none d-md-table-cell">{{ venta.estado_pago }}</td>
+                        <td class="action-buttons">
+                            <a href="{% url 'productos:venta_detail' venta.pk %}" class="btn btn-sm btn-info" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'productos:venta_update' venta.pk %}" class="btn btn-sm btn-warning" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'productos:venta_delete' venta.pk %}" class="btn btn-sm btn-danger" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay ventas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

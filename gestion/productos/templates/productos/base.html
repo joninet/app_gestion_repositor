@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Gestión{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'productos/css/responsive.css' %}">
+    <style>
+        /* Estilos generales */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Estilos para el sidebar */
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+            color: white;
+            transition: all 0.3s;
+        }
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+        }
+        .sidebar a:hover {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .sidebar .nav-header {
+            font-weight: bold;
+            padding: 10px 15px;
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Estilos para el contenido principal */
+        .content {
+            padding: 20px;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .action-buttons a {
+            margin-right: 5px;
+        }
+        
+        /* Estilos para el navbar móvil */
+        .mobile-navbar {
+            background-color: #343a40;
+            padding: 10px;
+        }
+        .mobile-navbar .navbar-brand {
+            color: white;
+            font-weight: bold;
+        }
+        .mobile-navbar .navbar-toggler {
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .mobile-navbar .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.7%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Estilos para dispositivos móviles */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                position: fixed;
+                top: 56px; /* Altura del navbar */
+                left: -100%;
+                width: 250px;
+                z-index: 1000;
+                transition: all 0.3s;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .content-wrapper {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+            .overlay.show {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar móvil (visible solo en dispositivos pequeños) -->
+    <nav class="navbar navbar-expand-lg d-lg-none mobile-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Sistema de Gestión</a>
+            <button class="navbar-toggler" type="button" id="sidebar-toggler" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Overlay para cerrar el sidebar en dispositivos móviles -->
+    <div class="overlay" id="sidebar-overlay"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-2 sidebar p-0" id="sidebar">
+                <div class="p-3 d-lg-block d-none">
+                    <h3 class="text-center">Sistema de Gestión</h3>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="user-info p-3 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="me-2">
+                            <i class="fas fa-user-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ user.username }}</div>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <a href="{% url 'productos:dashboard' %}" class="nav-link"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+                
+                <div class="nav-header">Catálogos</div>
+                <a href="{% url 'productos:proveedor_list' %}" class="nav-link"><i class="fas fa-truck me-2"></i> Proveedores</a>
+                <a href="{% url 'productos:unidadmedida_list' %}" class="nav-link"><i class="fas fa-ruler me-2"></i> Unidades de Medida</a>
+                <a href="{% url 'productos:marca_list' %}" class="nav-link"><i class="fas fa-tag me-2"></i> Marcas</a>
+                <a href="{% url 'productos:producto_list' %}" class="nav-link"><i class="fas fa-box me-2"></i> Productos</a>
+                <a href="{% url 'productos:stock_list' %}" class="nav-link"><i class="fas fa-warehouse me-2"></i> Stock</a>
+                <a href="{% url 'productos:zona_list' %}" class="nav-link"><i class="fas fa-map-marker-alt me-2"></i> Zonas</a>
+                <a href="{% url 'productos:cliente_list' %}" class="nav-link"><i class="fas fa-users me-2"></i> Clientes</a>
+                <a href="{% url 'productos:clientes_deudores' %}" class="nav-link"><i class="fas fa-hand-holding-usd me-2"></i> Clientes Deudores</a>
+                <a href="{% url 'productos:metodopago_list' %}" class="nav-link"><i class="fas fa-credit-card me-2"></i> Métodos de Pago</a>
+                
+                <div class="nav-header">Operaciones</div>
+                <a href="{% url 'productos:venta_list' %}" class="nav-link"><i class="fas fa-shopping-cart me-2"></i> Ventas</a>
+                <a href="{% url 'productos:pago_list' %}" class="nav-link"><i class="fas fa-hand-holding-usd me-2"></i> Pagos</a>
+                <a href="{% url 'productos:devolucion_list' %}" class="nav-link"><i class="fas fa-undo me-2"></i> Devoluciones</a>
+                
+                <div class="nav-header">Usuario</div>
+                <a href="{% url 'productos:profile' %}" class="nav-link"><i class="fas fa-user me-2"></i> Mi Perfil</a>
+                <a href="{% url 'productos:logout' %}" class="nav-link"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a>
+                {% else %}
+                <div class="nav-header">Acceso</div>
+                <a href="{% url 'productos:login' %}" class="nav-link"><i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión</a>
+                <a href="{% url 'productos:register' %}" class="nav-link"><i class="fas fa-user-plus me-2"></i> Registrarse</a>
+                {% endif %}
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-lg-10 content content-wrapper">
+                <!-- Messages -->
+                {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'error' %}
+                            <div class="me-3">
+                                <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                            </div>
+                            <div>
+                                <h5 class="alert-heading mb-1">¡Atención!</h5>
+                                <div class="message-content">{{ message|safe }}</div>
+                            </div>
+                            {% else %}
+                            <div class="me-3">
+                                {% if message.tags == 'success' %}
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                                {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-circle fa-2x text-warning"></i>
+                                {% elif message.tags == 'info' %}
+                                <i class="fas fa-info-circle fa-2x text-info"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {{ message }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>{% block header %}{% endblock %}</h2>
+                    <div>
+                        {% block header_buttons %}{% endblock %}
+                    </div>
+                </div>
+                
+                <!-- Main Content -->
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Script para el menú hamburguesa y responsive -->
+    <script>
+        $(document).ready(function() {
+            // Función para manejar el sidebar en dispositivos móviles
+            $('#sidebar-toggler').click(function() {
+                $('#sidebar').toggleClass('show');
+                $('#sidebar-overlay').toggleClass('show');
+            });
+            
+            // Cerrar el sidebar cuando se hace clic en el overlay
+            $('#sidebar-overlay').click(function() {
+                $('#sidebar').removeClass('show');
+                $('#sidebar-overlay').removeClass('show');
+            });
+            
+            // Cerrar el sidebar cuando se hace clic en un enlace (en dispositivos móviles)
+            $('.sidebar a.nav-link').click(function() {
+                if ($(window).width() < 992) {
+                    $('#sidebar').removeClass('show');
+                    $('#sidebar-overlay').removeClass('show');
+                }
+            });
+            
+            // Ajustar el sidebar al cambiar el tamaño de la ventana
+            $(window).resize(function() {
+                if ($(window).width() >= 992) {
+                    $('#sidebar').removeClass('show');
+                    $('#sidebar-overlay').removeClass('show');
+                }
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

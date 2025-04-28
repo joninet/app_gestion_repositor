@@ -1,0 +1,47 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Detalle de Venta{% endblock %}
+
+{% block header %}Detalle de Detalle de Venta{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:detalleventa_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:detalleventa_update' detalleventa.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:detalleventa_delete' detalleventa.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Venta</h5>
+                <p><a href="{{ detalleventa.venta.get_absolute_url }}">{{ detalleventa.venta }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Producto</h5>
+                <p><a href="{{ detalleventa.producto.get_absolute_url }}">{{ detalleventa.producto }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Cantidad</h5>
+                <p>{{ detalleventa.cantidad }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Precio Unitario</h5>
+                <p>${{ detalleventa.precio_unitario }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Subtotal</h5>
+                <p>${{ detalleventa.cantidad|floatformat:0|default:0|stringformat:"s"|add:" * "|add:detalleventa.precio_unitario|stringformat:"s"|add:" = $"|add:detalleventa.cantidad|floatformat:0|default:0|stringformat:"s"|add:"*"|add:detalleventa.precio_unitario|stringformat:"s" }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

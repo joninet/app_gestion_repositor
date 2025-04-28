@@ -1,0 +1,43 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Stock{% endblock %}
+
+{% block header %}Detalle de Stock{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:stock_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:stock_update' stock.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:stock_delete' stock.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Producto</h5>
+                <p><a href="{{ stock.producto.get_absolute_url }}">{{ stock.producto }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Cantidad</h5>
+                <p>{{ stock.cantidad }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Fecha de Modificación</h5>
+                <p>{{ stock.fecha_modificacion|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>En Uso</h5>
+                <p>{% if stock.en_uso %}Sí{% else %}No{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

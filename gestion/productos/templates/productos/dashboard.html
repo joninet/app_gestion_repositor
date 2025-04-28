@@ -1,0 +1,176 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block header %}Dashboard{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:profile' %}" class="btn btn-info">
+    <i class="fas fa-user"></i> Mi Perfil
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Bienvenido, {{ user.username }}</h4>
+                <p class="card-text">Este es tu panel de control donde puedes ver un resumen de tu actividad y acceder rápidamente a las funciones principales.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Ventas</h5>
+                        <h2 class="mb-0">{{ ventas_count }}</h2>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-3x"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'productos:venta_list' %}" class="text-white">Ver detalles</a>
+                <i class="fas fa-angle-right"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Productos</h5>
+                        <h2 class="mb-0">{{ productos_count }}</h2>
+                    </div>
+                    <i class="fas fa-box fa-3x"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'productos:producto_list' %}" class="text-white">Ver detalles</a>
+                <i class="fas fa-angle-right"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Clientes</h5>
+                        <h2 class="mb-0">{{ clientes_count }}</h2>
+                    </div>
+                    <i class="fas fa-users fa-3x"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'productos:cliente_list' %}" class="text-white">Ver detalles</a>
+                <i class="fas fa-angle-right"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Stock</h5>
+                        <h2 class="mb-0">{{ stock_count }}</h2>
+                    </div>
+                    <i class="fas fa-warehouse fa-3x"></i>
+                </div>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a href="{% url 'productos:stock_list' %}" class="text-white">Ver detalles</a>
+                <i class="fas fa-angle-right"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-shopping-cart me-2"></i>Últimas Ventas</h5>
+            </div>
+            <div class="card-body">
+                {% if ultimas_ventas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for venta in ultimas_ventas %}
+                            <tr>
+                                <td>{{ venta.cliente }}</td>
+                                <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+                                <td>${{ venta.total }}</td>
+                                <td>{{ venta.estado_pago }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay ventas registradas.</p>
+                {% endif %}
+                <a href="{% url 'productos:venta_list' %}" class="btn btn-primary">Ver todas las ventas</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>Stock Bajo</h5>
+            </div>
+            <div class="card-body">
+                {% if stock_bajo %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stock in stock_bajo %}
+                            <tr>
+                                <td>{{ stock.producto }}</td>
+                                <td>{{ stock.cantidad }}</td>
+                                <td>
+                                    <a href="{% url 'productos:stock_update' stock.id %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay productos con stock bajo.</p>
+                {% endif %}
+                <a href="{% url 'productos:stock_create' %}" class="btn btn-success">Agregar stock</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

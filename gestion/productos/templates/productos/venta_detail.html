@@ -1,0 +1,173 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Venta{% endblock %}
+
+{% block header %}Detalle de Venta{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:venta_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:venta_update' venta.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:venta_delete' venta.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% if venta.saldo_pendiente > 0 %}
+<a href="{% url 'productos:registrar_pago' venta.pk %}" class="btn btn-success">
+    <i class="fas fa-money-bill"></i> Registrar Pago
+</a>
+{% endif %}
+<a href="{% url 'productos:venta_pdf' venta.pk %}" class="btn btn-info" target="_blank">
+    <i class="fas fa-file-pdf"></i> Descargar Remito
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Cliente</h5>
+                <p><a href="{{ venta.cliente.get_absolute_url }}">{{ venta.cliente }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Fecha</h5>
+                <p>{{ venta.fecha|date:"d/m/Y" }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Total</h5>
+                <p>${{ venta.total }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Monto Pagado</h5>
+                <p>${{ venta.monto_pagado }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Saldo Pendiente</h5>
+                <p class="{% if venta.saldo_pendiente > 0 %}text-danger fw-bold{% else %}text-success{% endif %}">
+                    ${{ venta.saldo_pendiente }}
+                </p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Estado de Pago</h5>
+                <p>
+                    {% if venta.estado_pago.estado == 'Completo' %}
+                    <span class="badge bg-success">{{ venta.estado_pago }}</span>
+                    {% elif venta.estado_pago.estado == 'Parcial' %}
+                    <span class="badge bg-warning">{{ venta.estado_pago }}</span>
+                    {% else %}
+                    <span class="badge bg-danger">{{ venta.estado_pago }}</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Detalles de Venta -->
+        <hr>
+        <h4>Detalles de la Venta</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in venta.detalleventa_set.all %}
+                    <tr>
+                        <td><a href="{{ detalle.producto.get_absolute_url }}">{{ detalle.producto }}</a></td>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>${{ detalle.precio_unitario }}</td>
+                        <td>${{ detalle.cantidad|floatformat:0|default:0|stringformat:"s"|add:" * "|add:detalle.precio_unitario|stringformat:"s"|add:" = $"|add:detalle.cantidad|floatformat:0|default:0|stringformat:"s"|add:"*"|add:detalle.precio_unitario|stringformat:"s" }}</td>
+                        <td>
+                            <a href="{{ detalle.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay detalles para esta venta.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagos -->
+        <hr>
+        <h4>Pagos Realizados</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Método de Pago</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in venta.pago_set.all %}
+                    <tr>
+                        <td>{{ pago.fecha|date:"d/m/Y" }}</td>
+                        <td>${{ pago.monto }}</td>
+                        <td>{{ pago.metodo_pago }}</td>
+                        <td>
+                            <a href="{{ pago.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay pagos registrados para esta venta.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Devoluciones -->
+        <hr>
+        <h4>Devoluciones</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for devolucion in venta.devolucion_set.all %}
+                    <tr>
+                        <td><a href="{{ devolucion.producto.get_absolute_url }}">{{ devolucion.producto }}</a></td>
+                        <td>{{ devolucion.cantidad }}</td>
+                        <td>{{ devolucion.fecha|date:"d/m/Y" }}</td>
+                        <td>
+                            <a href="{{ devolucion.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay devoluciones registradas para esta venta.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

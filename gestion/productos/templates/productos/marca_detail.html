@@ -1,0 +1,35 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Marca{% endblock %}
+
+{% block header %}Detalle de Marca{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:marca_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:marca_update' marca.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:marca_delete' marca.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Nombre</h5>
+                <p>{{ marca.nombre }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Proveedor</h5>
+                <p><a href="{{ marca.proveedor.get_absolute_url }}">{{ marca.proveedor }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Pago{% endblock %}
+
+{% block header %}Detalle de Pago{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:pago_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:pago_update' pago.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:pago_delete' pago.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Venta</h5>
+                <p><a href="{{ pago.venta.get_absolute_url }}">{{ pago.venta }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Fecha</h5>
+                <p>{{ pago.fecha|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Monto</h5>
+                <p>${{ pago.monto }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Método de Pago</h5>
+                <p><a href="{{ pago.metodo_pago.get_absolute_url }}">{{ pago.metodo_pago }}</a></p>
+            </div>
+        </div>
+        
+        <!-- Información de la venta -->
+        <hr>
+        <h4>Información de la Venta</h4>
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <h5>Cliente</h5>
+                        <p><a href="{{ pago.venta.cliente.get_absolute_url }}">{{ pago.venta.cliente }}</a></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Fecha de Venta</h5>
+                        <p>{{ pago.venta.fecha|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Total de Venta</h5>
+                        <p>${{ pago.venta.total }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <h5>Estado de Pago</h5>
+                        <p>{{ pago.venta.estado_pago }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

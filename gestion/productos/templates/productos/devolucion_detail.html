@@ -1,0 +1,59 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Devolución{% endblock %}
+
+{% block header %}Detalle de Devolución{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:devolucion_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:devolucion_update' devolucion.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:devolucion_delete' devolucion.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Venta</h5>
+                <p><a href="{{ devolucion.venta.get_absolute_url }}">{{ devolucion.venta }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Producto</h5>
+                <p><a href="{{ devolucion.producto.get_absolute_url }}">{{ devolucion.producto }}</a></p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Cantidad</h5>
+                <p>{{ devolucion.cantidad }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Fecha</h5>
+                <p>{{ devolucion.fecha|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Volver al Stock</h5>
+                <p>
+                    {% if devolucion.volver_al_stock %}
+                    <span class="badge bg-success">Sí</span> El producto fue devuelto al inventario
+                    {% else %}
+                    <span class="badge bg-danger">No</span> El producto no fue devuelto al inventario
+                    {% endif %}
+                </p>
+            </div>
+            {% if devolucion.motivo %}
+            <div class="col-md-12 mb-3">
+                <h5>Motivo de la devolución</h5>
+                <p>{{ devolucion.motivo }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

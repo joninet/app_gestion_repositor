@@ -1,0 +1,109 @@
+{% extends 'productos/base.html' %}
+{% load productos_filters %}
+
+{% block title %}Detalle de Proveedor{% endblock %}
+
+{% block header %}Detalle de Proveedor{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:proveedor_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+<a href="{% url 'productos:proveedor_update' proveedor.pk %}" class="btn btn-warning">
+    <i class="fas fa-edit"></i> Editar
+</a>
+<a href="{% url 'productos:proveedor_delete' proveedor.pk %}" class="btn btn-danger">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <h5>Nombre</h5>
+                <p>{{ proveedor.nombre }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Dirección</h5>
+                <p>{{ proveedor.direccion }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Email</h5>
+                <p>{{ proveedor.email }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <h5>Teléfono</h5>
+                <p>{{ proveedor.telefono }}</p>
+            </div>
+        </div>
+        
+        <!-- Productos relacionados -->
+        <hr>
+        <h4>Productos</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Unidad de Medida</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in proveedor.producto_set.all %}
+                    <tr>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.descripcion }}</td>
+                        <td>${{ producto.precio }}</td>
+                        <td>{{ producto.um }}</td>
+                        <td>
+                            <a href="{{ producto.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No hay productos asociados a este proveedor.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Marcas relacionadas -->
+        <hr>
+        <h4>Marcas</h4>
+        <div class="table-responsive mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for marca in proveedor.marca_set.all %}
+                    <tr>
+                        <td>{{ marca.nombre }}</td>
+                        <td>
+                            <a href="{{ marca.get_absolute_url }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center">No hay marcas asociadas a este proveedor.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

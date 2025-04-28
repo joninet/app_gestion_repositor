@@ -1,0 +1,383 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}{% if object %}Editar{% else %}Nueva{% endif %} Venta{% endblock %}
+
+{% block header %}{% if object %}Editar{% else %}Nueva{% endif %} Venta{% endblock %}
+
+{% block header_buttons %}
+<a href="{% url 'productos:venta_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" novalidate id="venta-form">
+            {% csrf_token %}
+            
+            <h4 class="mb-4">Información de la Venta</h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ venta_form.cliente.id_for_label }}" class="form-label">Cliente</label>
+                    {{ venta_form.cliente }}
+                    {% if venta_form.cliente.errors %}
+                    <div class="text-danger">
+                        {% for error in venta_form.cliente.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <label for="{{ venta_form.estado_pago.id_for_label }}" class="form-label">Estado de Pago</label>
+                    {{ venta_form.estado_pago }}
+                    <small class="form-text text-muted">{{ venta_form.estado_pago.help_text }}</small>
+                    {% if venta_form.estado_pago.errors %}
+                    <div class="text-danger">
+                        {% for error in venta_form.estado_pago.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-6 mb-3" id="monto-pagado-container" style="display: none;">
+                    <label for="{{ venta_form.monto_pagado.id_for_label }}" class="form-label">Monto Pagado</label>
+                    {{ venta_form.monto_pagado }}
+                    <small class="form-text text-muted">{{ venta_form.monto_pagado.help_text }}</small>
+                    <small class="form-text text-muted" id="saldo-pendiente-info"></small>
+                    {% if venta_form.monto_pagado.errors %}
+                    <div class="text-danger">
+                        {% for error in venta_form.monto_pagado.errors %}
+                        <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <h4 class="mt-4 mb-3">Productos</h4>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Agregue los productos que desea incluir en la venta.
+            </div>
+            
+            <div id="detalles-container">
+                {{ detalle_formset.management_form }}
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="detalles-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="d-none d-md-table-cell">Precio Costo</th>
+                                <th class="d-none d-md-table-cell">% Ganancia</th>
+                                <th>Precio Venta</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                        {% for form in detalle_formset.forms %}
+                        <tr class="detalle-form">
+                            <td>
+                                {{ form.id }}
+                                {{ form.producto }}
+                                {% if form.producto.errors %}
+                                <div class="text-danger">
+                                    <small>{{ form.producto.errors }}</small>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                {{ form.precio_costo }}
+                                {{ form.precio_unitario.as_hidden }}
+                                {% if form.precio_costo.errors %}
+                                <div class="text-danger">
+                                    <small>{{ form.precio_costo.errors }}</small>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-md-table-cell">
+                                {{ form.porcentaje_ganancia }}
+                                {% if form.porcentaje_ganancia.errors %}
+                                <div class="text-danger">
+                                    <small>{{ form.porcentaje_ganancia.errors }}</small>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.precio_venta }}
+                                {% if form.precio_venta.errors %}
+                                <div class="text-danger">
+                                    <small>{{ form.precio_venta.errors }}</small>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ form.cantidad }}
+                                {% if form.cantidad.errors %}
+                                <div class="text-danger">
+                                    <small>{{ form.cantidad.errors }}</small>
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="subtotal">$0.00</span>
+                            </td>
+                            <td>
+                                {% if forloop.first and detalle_formset.forms|length == 1 %}
+                                <button type="button" class="btn btn-sm btn-danger" disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-danger delete-row">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                                {{ form.DELETE }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-end"><strong>Total:</strong></td>
+                            <td><strong id="total-venta">$0.00</strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-success w-100 w-md-auto" id="add-producto">
+                    <i class="fas fa-plus"></i> Agregar Producto
+                </button>
+            </div>
+            
+            <div class="mt-4 form-buttons">
+                <div class="row">
+                    <div class="col-12 col-md-auto mb-2 mb-md-0">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <a href="{% url 'productos:venta_list' %}" class="btn btn-secondary w-100">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Aplicar clases de Bootstrap a los campos del formulario
+        $('input, select, textarea').addClass('form-control');
+        
+        // Ocultar los checkboxes de DELETE
+        $('.detalle-form').find('input[type="checkbox"]').hide();
+        
+        // Función para mostrar/ocultar el campo de monto pagado según el estado de pago
+        function toggleMontoPagado() {
+            var estadoPago = $('#{{ venta_form.estado_pago.id_for_label }}').val();
+            var estadoPagoText = $('#{{ venta_form.estado_pago.id_for_label }} option:selected').text();
+            
+            if (estadoPagoText === 'Parcial') {
+                $('#monto-pagado-container').show();
+                $('#{{ venta_form.monto_pagado.id_for_label }}').prop('required', true);
+            } else if (estadoPagoText === 'Completo') {
+                $('#monto-pagado-container').show();
+                // Si es pago completo, establecer el monto pagado igual al total
+                var total = parseFloat($('#total-venta').text().replace('$', '')) || 0;
+                $('#{{ venta_form.monto_pagado.id_for_label }}').val(total.toFixed(2));
+                $('#{{ venta_form.monto_pagado.id_for_label }}').prop('required', true);
+            } else {
+                // Si es 'Debe Total', ocultar el campo y establecer el valor en 0
+                $('#monto-pagado-container').hide();
+                $('#{{ venta_form.monto_pagado.id_for_label }}').val('0');
+                $('#{{ venta_form.monto_pagado.id_for_label }}').prop('required', false);
+            }
+        }
+        
+        // Inicializar el estado del campo de monto pagado
+        toggleMontoPagado();
+        
+        // Actualizar cuando cambia el estado de pago
+        $('#{{ venta_form.estado_pago.id_for_label }}').change(function() {
+            toggleMontoPagado();
+        });
+        
+        // Función para actualizar los precios cuando se selecciona un producto
+        function actualizarPrecio(row) {
+            var productoSelect = $(row).find('.producto-select');
+            var precioUnitarioInput = $(row).find('input.precio-unitario-input');
+            var precioCostoInput = $(row).find('input.precio-costo-input');
+            var porcentajeInput = $(row).find('input.porcentaje-input');
+            var precioVentaInput = $(row).find('input.precio-venta-input');
+            var cantidadInput = $(row).find('input.cantidad-input');
+            var subtotalSpan = $(row).find('.subtotal');
+            
+            var productoId = productoSelect.val();
+            if (productoId) {
+                // Obtener el precio del producto seleccionado
+                {% for producto in productos %}
+                if (productoId == "{{ producto.id }}") {
+                    var precioCosto = {{ producto.precio }};
+                    // Asegurarse de que ambos campos tengan el mismo valor
+                    precioCostoInput.val(precioCosto);
+                    precioUnitarioInput.val(precioCosto);
+                    
+                    console.log('Producto seleccionado:', productoId, 'Precio costo:', precioCosto);
+                    console.log('precio_unitario:', precioUnitarioInput.val());
+                    console.log('precio_costo:', precioCostoInput.val());
+                    
+                    // Calcular precio de venta basado en el porcentaje
+                    var porcentaje = parseFloat(porcentajeInput.val()) || 0;
+                    var precioVenta = precioCosto * (1 + porcentaje / 100);
+                    precioVentaInput.val(precioVenta.toFixed(2));
+                    
+                    // Calcular subtotal
+                    var cantidad = parseInt(cantidadInput.val()) || 0;
+                    var subtotal = precioVenta * cantidad;
+                    subtotalSpan.text('$' + subtotal.toFixed(2));
+                }
+                {% endfor %}
+            } else {
+                precioUnitarioInput.val('0');
+                precioCostoInput.val('0');
+                precioVentaInput.val('0');
+                subtotalSpan.text('$0.00');
+            }
+            
+            // Actualizar total
+            actualizarTotal();
+        }
+        
+        // Función para actualizar el total de la venta
+        function actualizarTotal() {
+            var total = 0;
+            $('.subtotal').each(function() {
+                var subtotal = parseFloat($(this).text().replace('$', '')) || 0;
+                total += subtotal;
+            });
+            $('#total-venta').text('$' + total.toFixed(2));
+            
+            // Actualizar el monto pagado si el estado es 'Completo'
+            var estadoPagoText = $('#{{ venta_form.estado_pago.id_for_label }} option:selected').text();
+            if (estadoPagoText === 'Completo') {
+                $('#{{ venta_form.monto_pagado.id_for_label }}').val(total.toFixed(2));
+            }
+            
+            // Actualizar información de saldo pendiente
+            var montoPagado = parseFloat($('#{{ venta_form.monto_pagado.id_for_label }}').val()) || 0;
+            var saldoPendiente = total - montoPagado;
+            if (saldoPendiente < 0) saldoPendiente = 0;
+            $('#saldo-pendiente-info').html('Total: $' + total.toFixed(2) + ' - Pagado: $' + montoPagado.toFixed(2) + ' = <strong>Saldo pendiente: $' + saldoPendiente.toFixed(2) + '</strong>');
+        }
+        
+        // Inicializar los precios y subtotales
+        $('.detalle-form').each(function() {
+            actualizarPrecio(this);
+        });
+        
+        // Actualizar precio cuando se selecciona un producto
+        $(document).on('change', '.producto-select', function() {
+            actualizarPrecio($(this).closest('tr'));
+        });
+        
+        // Actualizar subtotal cuando cambia la cantidad
+        $(document).on('change', '.cantidad-input', function() {
+            actualizarPrecio($(this).closest('tr'));
+        });
+        
+        // Actualizar precio de venta cuando cambia el porcentaje de ganancia
+        $(document).on('change', '.porcentaje-input', function() {
+            actualizarPrecio($(this).closest('tr'));
+        });
+        
+        // Sincronizar precio_unitario cuando cambia precio_costo
+        $(document).on('change', '.precio-costo-input', function() {
+            var row = $(this).closest('tr');
+            var precioCostoInput = $(row).find('input.precio-costo-input');
+            var precioUnitarioInput = $(row).find('input.precio-unitario-input');
+            var porcentajeInput = $(row).find('input.porcentaje-input');
+            var precioVentaInput = $(row).find('input.precio-venta-input');
+            
+            // Sincronizar precio_unitario con precio_costo
+            precioUnitarioInput.val(precioCostoInput.val());
+            
+            // Recalcular precio de venta
+            var precioCosto = parseFloat(precioCostoInput.val()) || 0;
+            var porcentaje = parseFloat(porcentajeInput.val()) || 0;
+            var precioVenta = precioCosto * (1 + porcentaje / 100);
+            precioVentaInput.val(precioVenta.toFixed(2));
+            
+            // Actualizar subtotal
+            var cantidad = parseInt($(row).find('input.cantidad-input').val()) || 0;
+            var subtotal = precioVenta * cantidad;
+            $(row).find('.subtotal').text('$' + subtotal.toFixed(2));
+            
+            // Actualizar total
+            actualizarTotal();
+        });
+        
+        // Actualizar saldo pendiente cuando cambia el monto pagado
+        $('#{{ venta_form.monto_pagado.id_for_label }}').on('input', function() {
+            actualizarTotal();
+        });
+        
+        // Agregar nueva fila de producto
+        $('#add-producto').click(function() {
+            var formCount = parseInt($('#id_detalles-TOTAL_FORMS').val());
+            var row = $('.detalle-form:first').clone(true);
+            
+            // Actualizar los IDs y nombres de los campos
+            row.find(':input').each(function() {
+                var name = $(this).attr('name');
+                if (name) {
+                    name = name.replace('-0-', '-' + formCount + '-');
+                    $(this).attr('name', name);
+                }
+                
+                var id = $(this).attr('id');
+                if (id) {
+                    id = id.replace('-0-', '-' + formCount + '-');
+                    $(this).attr('id', id);
+                }
+            });
+            
+            // Limpiar valores
+            row.find('select').val('');
+            row.find('.cantidad-input').val('1');
+            row.find('.precio-costo-input').val('');
+            row.find('.porcentaje-input').val('20.00'); // Valor predeterminado del 20%
+            row.find('.precio-venta-input').val('');
+            row.find('.subtotal').text('$0.00');
+            row.find('.delete-row').prop('disabled', false);
+            
+            // Agregar la nueva fila a la tabla
+            $('#detalles-table tbody').append(row);
+            
+            // Incrementar el contador de formularios
+            $('#id_detalles-TOTAL_FORMS').val(formCount + 1);
+        });
+        
+        // Eliminar fila
+        $(document).on('click', '.delete-row', function() {
+            var row = $(this).closest('tr');
+            row.find('input[type="checkbox"]').prop('checked', true);
+            row.hide();
+            actualizarTotal();
+        });
+    });
+</script>
+{% endblock %}
