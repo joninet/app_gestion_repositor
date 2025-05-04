@@ -3,7 +3,7 @@ services:
     name: app-gestion-repositor
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "cd gestion && gunicorn gestion.wsgi:application"
+    startCommand: "./start.sh"
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
