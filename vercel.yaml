@@ -1,0 +1,14 @@
+version: 2
+builds:
+  - src: gestion/wsgi.py
+    use: '@vercel/python'
+    config:
+      maxLambdaSize: 15mb
+      runtime: python3.9
+routes:
+  - src: /static/(.*)
+    dest: /gestion/staticfiles/$1
+  - src: /media/(.*)
+    dest: /gestion/media/$1
+  - src: /(.*)
+    dest: gestion/wsgi.py
