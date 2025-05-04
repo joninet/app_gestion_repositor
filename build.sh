@@ -1,11 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
 
-# Instalar dependencias
+echo "Installing dependencies..."
 pip install -r requirements.txt
 
-# Crear directorio de archivos estáticos si no existe
+echo "Creating staticfiles directory..."
 mkdir -p gestion/staticfiles
 
-# Recopilar archivos estáticos
+echo "Collecting static files..."
 cd gestion
 python manage.py collectstatic --noinput
