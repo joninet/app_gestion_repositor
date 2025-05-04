@@ -1,0 +1,158 @@
+{% extends 'productos/base.html' %}
+{% load static %}
+
+{% block title %}Gestionar Productos - {{ object.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Gestionar Productos del Catálogo</h1>
+            <p class="lead">{{ object.nombre }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a href="{% url 'productos:catalogo_detail' object.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <a href="{% url 'productos:agregar_productos_catalogo' object.id %}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Añadir Productos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Productos en el Catálogo</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle"></i> 
+                    Configura los productos de tu catálogo. Puedes establecer el porcentaje de ganancia para cada producto, 
+                    destacar productos importantes y ordenarlos según tu preferencia.
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio Base</th>
+                                <th>% Ganancia</th>
+                                <th>Precio Final</th>
+                                <th>Destacado</th>
+                                <th>Orden</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for form in formset %}
+                                <tr class="formset-row {% if form.errors %}table-danger{% endif %}">
+                                    {{ form.id }}
+                                    <td>
+                                        {% if form.instance.pk %}
+                                            {{ form.producto.value }}
+                                            <input type="hidden" name="{{ form.producto.html_name }}" value="{{ form.instance.producto.id }}">
+                                        {% else %}
+                                            {{ form.producto }}
+                                        {% endif %}
+                                        {% if form.producto.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.producto.errors }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if form.instance.pk %}
+                                            ${{ form.instance.producto.precio }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ form.porcentaje_ganancia }}
+                                        {% if form.porcentaje_ganancia.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.porcentaje_ganancia.errors }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="precio-final">
+                                        {% if form.instance.pk %}
+                                            ${{ form.instance.precio_final }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ form.destacado }}
+                                        {% if form.destacado.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.destacado.errors }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ form.orden }}
+                                        {% if form.orden.errors %}
+                                            <div class="invalid-feedback d-block">{{ form.orden.errors }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if form.instance.pk %}
+                                            {{ form.DELETE }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% if form.non_field_errors %}
+                                    <tr>
+                                        <td colspan="7" class="text-danger">{{ form.non_field_errors }}</td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Calcular precio final cuando cambia el porcentaje de ganancia
+        const porcentajeInputs = document.querySelectorAll('input[name$="-porcentaje_ganancia"]');
+        
+        porcentajeInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const row = this.closest('tr');
+                const precioBaseText = row.cells[1].textContent.trim();
+                
+                if (precioBaseText !== '-') {
+                    const precioBase = parseFloat(precioBaseText.replace('$', ''));
+                    const porcentaje = parseFloat(this.value);
+                    
+                    if (!isNaN(precioBase) && !isNaN(porcentaje)) {
+                        const precioFinal = precioBase + (precioBase * porcentaje / 100);
+                        row.querySelector('.precio-final').textContent = '$' + precioFinal.toFixed(2);
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

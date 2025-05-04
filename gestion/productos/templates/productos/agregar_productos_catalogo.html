@@ -1,0 +1,130 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Añadir Productos - {{ catalogo.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Añadir Productos al Catálogo</h1>
+            <p class="lead">{{ catalogo.nombre }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'productos:catalogo_detail' catalogo.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Seleccionar Productos</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="alert alert-info mb-4">
+                    <i class="fas fa-info-circle"></i> 
+                    Selecciona los productos que deseas añadir a tu catálogo. Puedes establecer un porcentaje de ganancia predeterminado
+                    que se aplicará a todos los productos seleccionados.
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.porcentaje_ganancia_default.id_for_label }}" class="form-label">
+                        Porcentaje de Ganancia Predeterminado
+                    </label>
+                    {{ form.porcentaje_ganancia_default }}
+                    {% if form.porcentaje_ganancia_default.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.porcentaje_ganancia_default.errors }}
+                        </div>
+                    {% endif %}
+                    {% if form.porcentaje_ganancia_default.help_text %}
+                        <div class="form-text">{{ form.porcentaje_ganancia_default.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Productos Disponibles</label>
+                    
+                    {% if form.productos.field.queryset %}
+                        <div class="row">
+                            {% for producto in form.productos.field.queryset %}
+                                <div class="col-md-4 mb-2">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" 
+                                                       name="{{ form.productos.name }}" 
+                                                       value="{{ producto.id }}" 
+                                                       id="producto_{{ producto.id }}">
+                                                <label class="form-check-label" for="producto_{{ producto.id }}">
+                                                    {{ producto.nombre }}
+                                                </label>
+                                            </div>
+                                            <p class="small text-muted mb-1">{{ producto.descripcion|truncatechars:50 }}</p>
+                                            <p class="mb-0"><strong>Precio Base:</strong> ${{ producto.precio }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            No hay productos disponibles para añadir a este catálogo. 
+                            Todos tus productos ya están incluidos o necesitas crear nuevos productos.
+                        </div>
+                    {% endif %}
+                    
+                    {% if form.productos.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.productos.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary" {% if not form.productos.field.queryset %}disabled{% endif %}>
+                        <i class="fas fa-plus"></i> Añadir Productos Seleccionados
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleccionar/deseleccionar todos los productos
+        const selectAllBtn = document.getElementById('select-all');
+        if (selectAllBtn) {
+            selectAllBtn.addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('input[name="{{ form.productos.name }}"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            });
+        }
+        
+        const deselectAllBtn = document.getElementById('deselect-all');
+        if (deselectAllBtn) {
+            deselectAllBtn.addEventListener('click', function() {
+                const checkboxes = document.querySelectorAll('input[name="{{ form.productos.name }}"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

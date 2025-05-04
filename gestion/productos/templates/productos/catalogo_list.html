@@ -1,0 +1,85 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Catálogos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Catálogos</h1>
+            <p class="lead">Gestiona tus catálogos de productos</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'productos:catalogo_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Catálogo
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        {% if catalogos %}
+            {% for catalogo in catalogos %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ catalogo.nombre }}</h5>
+                            {% if catalogo.activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            {% if catalogo.descripcion %}
+                                <p>{{ catalogo.descripcion }}</p>
+                            {% else %}
+                                <p class="text-muted">Sin descripción</p>
+                            {% endif %}
+                            
+                            <p class="mb-1"><strong>Creado:</strong> {{ catalogo.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                            <p><strong>Actualizado:</strong> {{ catalogo.fecha_actualizacion|date:"d/m/Y H:i" }}</p>
+                            
+                            <div class="d-flex justify-content-between mt-3">
+                                <a href="{% url 'productos:catalogo_detail' catalogo.id %}" class="btn btn-info">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{{ catalogo.get_public_url }}" class="btn btn-success" target="_blank">
+                                    <i class="fas fa-globe"></i> Ver Público
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group w-100">
+                                <a href="{% url 'productos:catalogo_update' catalogo.id %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <a href="{% url 'productos:productos_catalogo' catalogo.id %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-list"></i> Productos
+                                </a>
+                                <a href="{% url 'productos:catalogo_delete' catalogo.id %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No tienes catálogos creados. <a href="{% url 'productos:catalogo_create' %}">Crea tu primer catálogo</a>.
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

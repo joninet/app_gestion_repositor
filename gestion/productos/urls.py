@@ -4,6 +4,7 @@ from . import views
 from . import auth_views as custom_auth_views
 from . import dashboard_views
 from . import user_views
+from . import catalogo_views
 from django.contrib.auth.decorators import login_required
 
 app_name = 'productos'
@@ -118,4 +119,16 @@ urlpatterns = [
     
     # PDF de remito
     path('ventas/<int:pk>/pdf/', login_required(views.VentaPDFView.as_view()), name='venta_pdf'),
+    
+    # Catálogo URLs (privadas, requieren autenticación)
+    path('catalogos/', login_required(catalogo_views.CatalogoListView.as_view()), name='catalogo_list'),
+    path('catalogos/nuevo/', login_required(catalogo_views.CatalogoCreateView.as_view()), name='catalogo_create'),
+    path('catalogos/<int:pk>/', login_required(catalogo_views.CatalogoDetailView.as_view()), name='catalogo_detail'),
+    path('catalogos/<int:pk>/editar/', login_required(catalogo_views.CatalogoUpdateView.as_view()), name='catalogo_update'),
+    path('catalogos/<int:pk>/eliminar/', login_required(catalogo_views.CatalogoDeleteView.as_view()), name='catalogo_delete'),
+    path('catalogos/<int:pk>/productos/', login_required(catalogo_views.ProductosCatalogoView.as_view()), name='productos_catalogo'),
+    path('catalogos/<int:pk>/agregar-productos/', login_required(catalogo_views.AgregarProductosCatalogoView.as_view()), name='agregar_productos_catalogo'),
+    
+    # URL pública para ver catálogos (no requiere autenticación)
+    path('c/<uuid:codigo>/', catalogo_views.CatalogoPublicoView.as_view(), name='catalogo_publico'),
 ]

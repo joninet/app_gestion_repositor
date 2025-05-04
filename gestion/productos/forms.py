@@ -1,6 +1,6 @@
 from django import forms
-from django.forms import inlineformset_factory
-from .models import Venta, DetalleVenta, Cliente, EstadoPago, Producto
+from django.forms import inlineformset_factory, modelformset_factory
+from .models import Venta, DetalleVenta, Cliente, EstadoPago, Producto, Catalogo, ProductoCatalogo
 
 class VentaForm(forms.ModelForm):
     monto_pagado = forms.DecimalField(
@@ -98,3 +98,67 @@ DetalleVentaFormSet = inlineformset_factory(
     extra=1,  # Número de formularios vacíos a mostrar
     can_delete=True  # Permitir eliminar líneas
 )
+
+
+class CatalogoForm(forms.ModelForm):
+    class Meta:
+        model = Catalogo
+        fields = ['nombre', 'descripcion', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'activo': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+
+class ProductoCatalogoForm(forms.ModelForm):
+    class Meta:
+        model = ProductoCatalogo
+        fields = ['producto', 'porcentaje_ganancia', 'destacado', 'orden']
+        widgets = {
+            'producto': forms.Select(attrs={'class': 'form-control producto-select'}),
+            'porcentaje_ganancia': forms.NumberInput(attrs={'class': 'form-control porcentaje-input', 'step': '0.01', 'min': '0'}),
+            'destacado': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'orden': forms.NumberInput(attrs={'class': 'form-control', 'min': '0'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si hay un producto seleccionado, mostrar su precio actual como referencia
+        if self.instance and self.instance.producto_id:
+            self.fields['producto'].help_text = f'Precio actual: ${self.instance.producto.precio}'
+
+
+# Formset para productos en un catálogo
+ProductoCatalogoFormSet = inlineformset_factory(
+    Catalogo,
+    ProductoCatalogo,
+    form=ProductoCatalogoForm,
+    extra=1,
+    can_delete=True
+)
+
+
+# Formulario para seleccionar productos a añadir al catálogo
+class SeleccionProductosForm(forms.Form):
+    productos = forms.ModelMultipleChoiceField(
+        queryset=Producto.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
+        required=False
+    )
+    porcentaje_ganancia_default = forms.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        initial=20,
+        required=True,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+        help_text='Porcentaje de ganancia predeterminado para todos los productos seleccionados'
+    )
+    
+    def __init__(self, *args, **kwargs):
+        usuario = kwargs.pop('usuario', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filtrar productos por usuario si no es staff/superuser
+        if usuario and not (usuario.is_staff or usuario.is_superuser):
+            self.fields['productos'].queryset = Producto.objects.filter(usuario=usuario)

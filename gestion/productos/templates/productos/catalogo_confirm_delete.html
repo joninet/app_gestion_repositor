@@ -1,0 +1,45 @@
+{% extends 'productos/base.html' %}
+
+{% block title %}Eliminar Catálogo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Eliminar Catálogo</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'productos:catalogo_detail' catalogo.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title text-danger">¿Estás seguro de que deseas eliminar este catálogo?</h5>
+            <p class="card-text">
+                Estás a punto de eliminar el catálogo <strong>"{{ catalogo.nombre }}"</strong>. 
+                Esta acción eliminará también todos los productos asociados a este catálogo y no se podrá deshacer.
+            </p>
+            
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i> 
+                El enlace público de este catálogo dejará de funcionar y cualquier persona que intente acceder a él recibirá un error.
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'productos:catalogo_detail' catalogo.id %}" class="btn btn-secondary me-md-2">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Sí, eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

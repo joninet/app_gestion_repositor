@@ -24,19 +24,23 @@ from .views import (
 # Vista de Inicio con autenticación
 class UserIndexView(LoginRequiredMixin, IndexView):
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Primero obtenemos el contexto de la clase padre pero sin llamar a super().get_context_data
+        # para evitar que se ejecute el código que calcula los counts
+        context = super(IndexView, self).get_context_data(**kwargs)
         user = self.request.user
         
-        # Si el usuario es staff o superuser, puede ver todos los datos
+        # Si el usuario es staff o superuser, puede ver todos los datos como en la clase padre
         if user.is_staff or user.is_superuser:
-            return context
+            return super().get_context_data(**kwargs)
             
-        # Filtrar datos por usuario
-        context['productos_count'] = context['productos_count'].filter(usuario=user).count()
-        context['clientes_count'] = context['clientes_count'].filter(usuario=user).count()
-        context['ventas_count'] = context['ventas_count'].filter(usuario=user).count()
-        context['ultimas_ventas'] = context['ultimas_ventas'].filter(usuario=user)
-        context['productos_bajo_stock'] = context['productos_bajo_stock'].filter(usuario=user)
+        # Filtrar datos por usuario antes de contar
+        from .models import Producto, Cliente, Venta, Stock
+        
+        context['productos_count'] = Producto.objects.filter(usuario=user).count()
+        context['clientes_count'] = Cliente.objects.filter(usuario=user).count()
+        context['ventas_count'] = Venta.objects.filter(usuario=user).count()
+        context['ultimas_ventas'] = Venta.objects.filter(usuario=user).order_by('-fecha')[:5]
+        context['productos_bajo_stock'] = Stock.objects.filter(cantidad__lt=10, en_uso=True, producto__usuario=user).order_by('cantidad')[:5]
         
         return context
 
