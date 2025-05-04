@@ -29,5 +29,7 @@ urlpatterns = [
 ]
 
 # Añadir URLs para servir archivos multimedia durante el desarrollo
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# En producción (Vercel), esto no funcionará directamente y necesitarás un servicio de almacenamiento externo
+# Sin embargo, lo dejamos configurado para que funcione en desarrollo y para que Vercel al menos
+# intente servir los archivos de media
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
