@@ -19,6 +19,7 @@ class Proveedor(models.Model):
 
 class UnidadMedida(models.Model):
     nombre = models.CharField(max_length=100)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.nombre
@@ -29,6 +30,7 @@ class UnidadMedida(models.Model):
 class Marca(models.Model):
     nombre = models.CharField(max_length=100)
     proveedor = models.ForeignKey(Proveedor, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.nombre
@@ -111,6 +113,7 @@ class Stock(models.Model):
 class Zona(models.Model):
     nombre = models.CharField(max_length=100)
     localidades = models.TextField(blank=True, null=True, help_text="Ingrese las localidades separadas por comas")
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     
     def __str__(self) -> str:
         return self.nombre
@@ -134,7 +137,11 @@ class Cliente(models.Model):
         return reverse('productos:cliente_detail', args=[str(self.id)])
 
 class EstadoPago(models.Model):
-    estado = models.CharField(max_length=20, unique=True)
+    estado = models.CharField(max_length=20)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    
+    class Meta:
+        unique_together = ('estado', 'usuario')
 
     def __str__(self) -> str:
         return self.estado
@@ -192,7 +199,11 @@ class DetalleVenta(models.Model):
         return reverse('productos:detalleventa_detail', args=[str(self.id)])
 
 class MetodoPago(models.Model):
-    metodo = models.CharField(max_length=50, unique=True)
+    metodo = models.CharField(max_length=50)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    
+    class Meta:
+        unique_together = ('metodo', 'usuario')
 
     def __str__(self) -> str:
         return self.metodo

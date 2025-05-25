@@ -22,8 +22,8 @@ class UserDataMixin(LoginRequiredMixin):
             
         # Si el modelo tiene un campo usuario, filtramos por ese campo
         if hasattr(queryset.model, 'usuario'):
-            # Incluir tanto los elementos del usuario como los que no tienen usuario asignado
-            return queryset.filter(Q(usuario=user) | Q(usuario__isnull=True))
+            # Solo mostrar los elementos del usuario actual
+            return queryset.filter(usuario=user)
             
         return queryset
     

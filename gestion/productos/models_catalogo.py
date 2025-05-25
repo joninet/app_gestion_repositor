@@ -5,6 +5,7 @@ from .models import Producto
 import uuid
 from django.utils.text import slugify
 
+
 class Catalogo(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
